@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { Animated, View, PanResponder, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 
 import Vector from './Vector';
 
@@ -83,7 +83,7 @@ const App = () => {
         <View style={styles.modalHeader}>
           <Text style={styles.modalTitle}>DMC 한강 호반 써밋</Text>
           <TouchableOpacity style={styles.fullViewButton}>
-            <Text style={styles.fullViewButtonText}>전체보기</Text>
+            <Text style={styles.fullViewButtonText}>전체 보기</Text>
           </TouchableOpacity>
           <Text style={styles.parkingText}>주차 가능 대수: 50</Text>
         </View>
@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'black'
   },
   box: {
     height: 400,
@@ -145,14 +146,14 @@ const styles = StyleSheet.create({
   },
   fullViewButton: {
     backgroundColor: '#DCDCDC',
-    padding: 10,
+    padding: 8,
     borderRadius: 100,
-    alignItems: 'center',
-    marginLeft: 5,
+    alignItems: 'flex-start',
   },
   fullViewButtonText: {
     color: 'black',
-    fontSize: 10,
+    fontWeight: '700',
+    fontSize: 8,
   },
   parkingText: {
     fontSize: 13,
