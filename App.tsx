@@ -1,51 +1,83 @@
-import React, { useRef, useState } from 'react';
-import { Animated, View, PanResponder, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, {useRef, useState} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+
 import Vector from './Vector';
 
 const App = () => {
-  const [pos, setPos] = useState<Vector>(Vector.zero);
   const [centerPos, setCenterPos] = useState<Vector>(Vector.zero);
+  const windowDimensions = Dimensions.get('window');
+  const initialPos = new Vector(windowDimensions.width / 2, windowDimensions.height / 2.5);
+  const [pos, setPos] = useState<Vector>(initialPos);
+
+  const [parkingSlots, setParkingSlots] = useState([
+    {id: 1, available: true, x: 60, y: 60, width: 30, height: 50},
+    {id: 2, available: false, x: 180, y: 60, width: 30, height: 50},
+    {id: 3, available: true, x: 300, y: 60, width: 30, height: 50},
+    {id: 4, available: false, x: 60, y: 180, width: 30, height: 50},
+    {id: 5, available: true, x: 180, y: 180, width: 30, height: 50},
+    {id: 6, available: false, x: 300, y: 180, width: 30, height: 50},
+    {id: 7, available: true, x: 60, y: 300, width: 30, height: 50},
+    {id: 8, available: false, x: 180, y: 300, width: 30, height: 50},
+    {id: 9, available: true, x: 300, y: 300, width: 30, height: 50},
+  ]);
 
   const ref = useRef(null);
 
   return (
     <View
       style={styles.container}
-      onTouchStart={(e) => {
+      onTouchStart={e => {
         if (e.currentTarget !== e.target) return;
         setCenterPos(Vector.zero);
         setPos(new Vector(e.nativeEvent.pageX, e.nativeEvent.pageY));
       }}
-      onTouchMove={(e) => {
+      onTouchMove={e => {
         setPos(new Vector(e.nativeEvent.pageX, e.nativeEvent.pageY));
-      }}
-    >
+      }}>
       <View
         style={{
           position: 'absolute',
           top: -centerPos.y,
           left: -centerPos.x,
-          transform: [{ translateX: pos.x - 75 }, { translateY: pos.y - 75 }],
-        }}
-      >
+          transform: [{translateX: pos.x - 200}, {translateY: pos.y - 200}],
+        }}>
         <View
           ref={ref}
-          onTouchStart={(e) => {
+          onTouchStart={e => {
             if (
               e.nativeEvent.locationX >= 0 &&
-              e.nativeEvent.locationX <= 150 &&
+              e.nativeEvent.locationX <= 400 &&
               e.nativeEvent.locationY >= 0 &&
-              e.nativeEvent.locationY <= 150
+              e.nativeEvent.locationY <= 400
             ) {
-              const vec = new Vector(e.nativeEvent.locationX - 75, e.nativeEvent.locationY - 75);
-              setCenterPos((v) => {
-                setPos((v2) => v2.minus(v.minus(vec)));
+              const vec = new Vector(
+                e.nativeEvent.locationX - 200,
+                e.nativeEvent.locationY - 200,
+              );
+              setCenterPos(v => {
+                setPos(v2 => v2.minus(v.minus(vec)));
                 return vec;
               });
             }
           }}
-          style={styles.box}
-        />
+          style={styles.box}>
+          {parkingSlots.map(slot => (
+            <View
+              key={slot.id}
+              style={[
+                styles.parkingSlot,
+                {
+                  left: slot.x,
+                  top: slot.y,
+                  width: slot.width,
+                  height: slot.height,
+                  backgroundColor: slot.available ? 'green' : 'gray',
+                },
+              ]}>
+              <Text style={styles.parkingSlotText}>{slot.id}</Text>
+            </View>
+          ))}
+        </View>
       </View>
       <View style={styles.modal}>
         <View style={styles.modalHeader}>
@@ -77,12 +109,13 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
   box: {
-    height: 150,
-    width: 150,
+    height: 400,
+    width: 400,
     backgroundColor: 'blue',
     borderRadius: 5,
   },
@@ -96,7 +129,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: {width: 0, height: -2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
@@ -155,12 +188,24 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   countButtonText: {
     color: 'white',
     fontSize: 20,
     paddingTop: 5,
+    fontWeight: 'bold',
+  },
+  parkingSlot: {
+    position: 'absolute',
+    borderWidth: 1,
+    borderColor: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  parkingSlotText: {
+    color: 'white',
     fontWeight: 'bold',
   },
 });
